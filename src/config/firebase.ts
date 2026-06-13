@@ -8,11 +8,11 @@
 // 6. Create Firestore database under Firestore Database
 // 7. Enable Storage under Storage
 
+import { Platform } from 'react-native';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { initializeAuth, getAuth, browserLocalPersistence, indexedDBLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAV3cM8B1B1X0RlIF3FAh7xcwXoiolvbr0",
@@ -24,20 +24,24 @@ const firebaseConfig = {
   measurementId: "G-85V6N2KEW4"
 };
 
-let app: ReturnType<typeof initializeApp>;
-if (getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApp();
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
+function buildAuth() {
+  if (getApps().length > 1) return getAuth(app);
+  if (Platform.OS === 'web') {
+    // Web: use IndexedDB persistence (survives page refresh)
+    return initializeAuth(app, { persistence: [indexedDBLocalPersistence, browserLocalPersistence] });
+  }
+  // Native: use AsyncStorage persistence
+  const { getReactNativePersistence } = require('firebase/auth');
+  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+  return initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
 }
 
-// AsyncStorage persistence keeps the user logged in across app restarts
-let _auth: ReturnType<typeof initializeAuth>;
+let _auth: ReturnType<typeof getAuth>;
 try {
-  _auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+  _auth = buildAuth();
 } catch {
-  // Auth already initialized (e.g. hot reload) — reuse the existing instance
-  const { getAuth } = require('firebase/auth');
   _auth = getAuth(app);
 }
 

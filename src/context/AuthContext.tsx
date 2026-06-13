@@ -29,9 +29,14 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
-  const [userProfile, setUserProfile] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // AUTH BYPASS — swap null for mock user during rough edits
+  const BYPASS_AUTH = true;
+  const MOCK_USER = BYPASS_AUTH ? { uid: 'demo-uid', email: 'demo@burnout.app', displayName: 'Demo' } as unknown as FirebaseUser : null;
+  const MOCK_PROFILE: User = { id: 'demo-uid', username: 'burnout_demo', bio: 'Built not bought 🔥', profilePhoto: '', vehicles: [], createdAt: new Date() };
+
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(MOCK_USER);
+  const [userProfile, setUserProfile] = useState<User | null>(BYPASS_AUTH ? MOCK_PROFILE : null);
+  const [loading, setLoading] = useState(!BYPASS_AUTH);
 
   async function fetchProfile(uid: string) {
     const snap = await getDoc(doc(db, 'users', uid));

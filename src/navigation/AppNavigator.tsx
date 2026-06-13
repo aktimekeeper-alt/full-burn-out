@@ -83,7 +83,10 @@ function MainTabs() {
 export default function AppNavigator() {
   const { currentUser, loading } = useAuth();
 
-  if (loading) {
+  // AUTH BYPASS — remove this block when login is ready
+  const BYPASS_AUTH = true;
+
+  if (loading && !BYPASS_AUTH) {
     return (
       <View style={{ flex: 1, backgroundColor: '#0D0D0D', justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator color="#FF4500" size="large" />
@@ -93,7 +96,7 @@ export default function AppNavigator() {
 
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      {!currentUser ? (
+      {!currentUser && !BYPASS_AUTH ? (
         <RootStack.Screen name="AuthStack" component={AuthNavigator} />
       ) : (
         <>

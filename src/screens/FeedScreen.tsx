@@ -33,7 +33,7 @@ import { Post } from '../types';
 import PostCard from '../components/PostCard';
 
 export default function FeedScreen() {
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -118,7 +118,8 @@ export default function FeedScreen() {
           <PostCard
             post={item}
             onLike={handleLike}
-            currentUserId={currentUser?.id ?? ''}
+            currentUserId={currentUser?.uid ?? ''}
+            currentUsername={userProfile?.username ?? 'anonymous'}
           />
         )}
         contentContainerStyle={{ paddingVertical: 8 }}

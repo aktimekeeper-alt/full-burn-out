@@ -2,8 +2,8 @@ import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
 import FeedScreen from '../screens/FeedScreen';
@@ -47,31 +47,28 @@ function AuthNavigator() {
   );
 }
 
-function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    Feed: '🔥',
-    Map: '📍',
-    Calculator: '🧮',
-    ChatList: '💬',
-    Profile: '👤',
-  };
-  return <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.5 }}>{icons[name] || '•'}</Text>;
-}
+type TabIconName = keyof typeof TAB_ICONS;
+const TAB_ICONS = {
+  Feed:       { active: 'flame',              inactive: 'flame-outline' },
+  Map:        { active: 'map',                inactive: 'map-outline' },
+  Calculator: { active: 'calculator',         inactive: 'calculator-outline' },
+  ChatList:   { active: 'chatbubbles',        inactive: 'chatbubbles-outline' },
+  Profile:    { active: 'person-circle',      inactive: 'person-circle-outline' },
+} as const;
 
 function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#0D0D0D',
-          borderTopColor: '#2A2A2A',
-          height: 60,
-          paddingBottom: 8,
-        },
+        tabBarStyle: { backgroundColor: '#0D0D0D', borderTopColor: '#2A2A2A', height: 62, paddingBottom: 8 },
         tabBarActiveTintColor: '#FF4500',
-        tabBarInactiveTintColor: '#666',
-        tabBarIcon: ({ focused }) => <TabIcon name={route.name} focused={focused} />,
+        tabBarInactiveTintColor: '#555',
+        tabBarIcon: ({ focused, size }) => {
+          const icons = TAB_ICONS[route.name as TabIconName];
+          if (!icons) return null;
+          return <Ionicons name={focused ? icons.active : icons.inactive} size={size} color={focused ? '#FF4500' : '#555'} />;
+        },
       })}
     >
       <Tab.Screen name="Feed" component={FeedScreen} options={{ title: 'Feed' }} />

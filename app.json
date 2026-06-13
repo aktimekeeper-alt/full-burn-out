@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "Burnout",
+    "slug": "full-burn-out",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0D0D0D"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.burnout.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Burnout needs your location to show nearby meets and share your position with attendees.",
+        "NSLocationAlwaysUsageDescription": "Burnout uses your location in the background to track your position at meets.",
+        "NSPhotoLibraryUsageDescription": "Burnout needs access to your photos to let you post images.",
+        "NSCameraUsageDescription": "Burnout needs camera access to take photos for posts."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0D0D0D"
+      },
+      "package": "com.burnout.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Burnout needs your location to show nearby meets and share your position with attendees."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Burnout needs access to your photos to let you post images.",
+          "cameraPermission": "Burnout needs camera access to take photos for posts."
+        }
+      ]
+    ]
+  }
+}

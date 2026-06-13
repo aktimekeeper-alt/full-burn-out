@@ -25,12 +25,12 @@ const {
 
 // ── PASTE YOUR FIREBASE CONFIG HERE ─────────────────────────────────────────
 const FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyAV3cM8B1B1X0RlIF3FAh7xcwXoiolvbr0",
+  authDomain: "burnout-57c14.firebaseapp.com",
+  projectId: "burnout-57c14",
+  storageBucket: "burnout-57c14.firebasestorage.app",
+  messagingSenderId: "257981638486",
+  appId: "1:257981638486:web:49162b0b5b77a833dc58f7",
 };
 // ─────────────────────────────────────────────────────────────────────────────
 

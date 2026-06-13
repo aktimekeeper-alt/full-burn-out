@@ -60,6 +60,22 @@ export default function LoginScreen() {
         <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.link}>Don't have an account? <Text style={styles.linkAccent}>Sign Up</Text></Text>
         </TouchableOpacity>
+
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>or</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        <TouchableOpacity
+          style={styles.demoBtn}
+          onPress={() => { setEmail('demo@burnout.app'); setPassword('demo1234'); }}
+        >
+          <Text style={styles.demoBtnText}>🔧 Fill Demo Credentials</Text>
+        </TouchableOpacity>
+        <Text style={styles.demoNote}>
+          Use demo@burnout.app / demo1234 after running scripts/seed.js
+        </Text>
       </View>
     </KeyboardAvoidingView>
   );
@@ -81,4 +97,13 @@ const styles = StyleSheet.create({
   btnText: { color: '#fff', fontWeight: '800', fontSize: 16, letterSpacing: 1 },
   link: { color: '#888', textAlign: 'center', fontSize: 14 },
   linkAccent: { color: '#FF4500', fontWeight: '700' },
+  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: '#2A2A2A' },
+  dividerText: { color: '#555', marginHorizontal: 12, fontSize: 13 },
+  demoBtn: {
+    borderWidth: 1, borderColor: '#FF4500', borderRadius: 10,
+    padding: 14, alignItems: 'center', marginBottom: 8,
+  },
+  demoBtnText: { color: '#FF4500', fontWeight: '700', fontSize: 15 },
+  demoNote: { color: '#555', textAlign: 'center', fontSize: 11, lineHeight: 16 },
 });

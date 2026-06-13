@@ -9,9 +9,10 @@
 // 7. Enable Storage under Storage
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -22,9 +23,24 @@ const firebaseConfig = {
   appId: "YOUR_APP_ID"
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+let app: ReturnType<typeof initializeApp>;
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApp();
+}
 
-export const auth = getAuth(app);
+// AsyncStorage persistence keeps the user logged in across app restarts
+let _auth: ReturnType<typeof initializeAuth>;
+try {
+  _auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+} catch {
+  // Auth already initialized (e.g. hot reload) — reuse the existing instance
+  const { getAuth } = require('firebase/auth');
+  _auth = getAuth(app);
+}
+
+export const auth = _auth;
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export default app;

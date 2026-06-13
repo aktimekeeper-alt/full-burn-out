@@ -20,6 +20,6 @@ echo  Scan the QR code with Expo Go on your phone
 echo  or press 'i' for iOS simulator / 'a' for Android
 echo.
 
-call npx expo start
+call npx expo start --tunnel
 
 pause

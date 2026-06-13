@@ -11,15 +11,14 @@
       "resizeMode": "contain",
       "backgroundColor": "#0D0D0D"
     },
-    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.burnout.app",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Burnout needs your location to show nearby meets and share your position with attendees.",
-        "NSLocationAlwaysUsageDescription": "Burnout uses your location in the background to track your position at meets.",
-        "NSPhotoLibraryUsageDescription": "Burnout needs access to your photos to let you post images.",
-        "NSCameraUsageDescription": "Burnout needs camera access to take photos for posts."
+        "NSLocationWhenInUseUsageDescription": "Burnout uses your location to show nearby meets and share your position with meet attendees.",
+        "NSLocationAlwaysUsageDescription": "Burnout uses your location in the background to share your position during meets.",
+        "NSCameraUsageDescription": "Burnout uses your camera to take photos for posts and your garage.",
+        "NSPhotoLibraryUsageDescription": "Burnout accesses your photos to post images and add vehicle photos."
       }
     },
     "android": {
@@ -32,9 +31,9 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
+        "CAMERA",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "CAMERA"
+        "WRITE_EXTERNAL_STORAGE"
       ]
     },
     "web": {
@@ -44,14 +43,14 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Burnout needs your location to show nearby meets and share your position with attendees."
+          "locationAlwaysAndWhenInUsePermission": "Burnout uses your location to show nearby meets and share your position with meet attendees."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Burnout needs access to your photos to let you post images.",
-          "cameraPermission": "Burnout needs camera access to take photos for posts."
+          "photosPermission": "Burnout accesses your photos to post images.",
+          "cameraPermission": "Burnout uses your camera to take photos."
         }
       ]
     ]

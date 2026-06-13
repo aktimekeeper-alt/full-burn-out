@@ -1,77 +1,91 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import {
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  User as FirebaseUser,
 } from 'firebase/auth';
-import { setDoc, doc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 import { User } from '../types';
 
 interface AuthContextType {
-  currentUser: User | null;
+  currentUser: FirebaseUser | null;
+  userProfile: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  return ctx;
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [userProfile, setUserProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  async function fetchProfile(uid: string) {
+    const snap = await getDoc(doc(db, 'users', uid));
+    if (snap.exists()) {
+      const data = snap.data();
+      setUserProfile({
+        id: snap.id,
+        username: data.username,
+        bio: data.bio || '',
+        profilePhoto: data.profilePhoto || '',
+        vehicles: data.vehicles || [],
+        createdAt: data.createdAt?.toDate() || new Date(),
+      });
+    }
+  }
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      if (user) {
+        await fetchProfile(user.uid);
+      } else {
+        setUserProfile(null);
+      }
+      setLoading(false);
+    });
+    return unsub;
+  }, []);
 
   async function login(email: string, password: string) {
     await signInWithEmailAndPassword(auth, email, password);
   }
 
   async function signup(email: string, password: string, username: string) {
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
-    const uid = credential.user.uid;
-    const newUser: User = {
-      id: uid,
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await setDoc(doc(db, 'users', cred.user.uid), {
       username,
       bio: '',
       profilePhoto: '',
       vehicles: [],
-      email,
-    };
-    await setDoc(doc(db, 'users', uid), newUser);
-    setCurrentUser(newUser);
+      createdAt: serverTimestamp(),
+    });
   }
 
   async function logout() {
     await signOut(auth);
-    setCurrentUser(null);
   }
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const snap = await getDoc(doc(db, 'users', firebaseUser.uid));
-          if (snap.exists()) {
-            setCurrentUser({ id: snap.id, ...snap.data() } as User);
-          }
-        } catch {
-          setCurrentUser(null);
-        }
-      } else {
-        setCurrentUser(null);
-      }
-      setLoading(false);
-    });
-    return unsubscribe;
-  }, []);
+  async function refreshProfile() {
+    if (currentUser) await fetchProfile(currentUser.uid);
+  }
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ currentUser, userProfile, loading, login, signup, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

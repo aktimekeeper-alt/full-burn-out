@@ -1,35 +1,29 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  KeyboardAvoidingView, Platform, Alert, ActivityIndicator,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../../context/AuthContext';
+import { AuthStackParamList } from '../../navigation/AppNavigator';
 
-export default function LoginScreen({ navigation }: any) {
-  const { login } = useAuth();
+type Nav = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
+
+export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigation = useNavigation<Nav>();
 
   async function handleLogin() {
-    if (!email || !password) {
-      setError('Please fill in all fields.');
-      return;
-    }
-    setError('');
+    if (!email || !password) { Alert.alert('Error', 'Please fill in all fields'); return; }
     setLoading(true);
     try {
       await login(email.trim(), password);
     } catch (e: any) {
-      setError(e.message || 'Failed to login. Check your credentials.');
+      Alert.alert('Login Failed', e.message);
     } finally {
       setLoading(false);
     }
@@ -37,73 +31,54 @@ export default function LoginScreen({ navigation }: any) {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled">
+      <View style={styles.inner}>
         <Text style={styles.logo}>🔥 BURNOUT</Text>
-        <Text style={styles.subtitle}>Car Enthusiast Community</Text>
-        <View style={styles.card}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="you@example.com"
-            placeholderTextColor="#888888"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="••••••••"
-            placeholderTextColor="#888888"
-            secureTextEntry
-          />
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-          <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-            {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={styles.buttonText}>LOGIN</Text>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-            <Text style={styles.link}>Don't have an account? <Text style={styles.linkAccent}>Sign Up</Text></Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        <Text style={styles.subtitle}>Car culture, unleashed.</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#555"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#555"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+
+        <TouchableOpacity style={styles.btn} onPress={handleLogin} disabled={loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>LOG IN</Text>}
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.link}>Don't have an account? <Text style={styles.linkAccent}>Sign Up</Text></Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0D0D0D' },
-  inner: { flexGrow: 1, justifyContent: 'center', padding: 24 },
-  logo: { fontSize: 36, fontWeight: 'bold', color: '#FF4500', textAlign: 'center', marginBottom: 4 },
-  subtitle: { color: '#888888', textAlign: 'center', marginBottom: 32, fontSize: 14 },
-  card: { backgroundColor: '#1A1A1A', borderRadius: 12, padding: 24, borderWidth: 1, borderColor: '#333333' },
-  label: { color: '#888888', fontSize: 12, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 },
+  inner: { flex: 1, justifyContent: 'center', padding: 28 },
+  logo: { fontSize: 42, fontWeight: '900', color: '#FF4500', textAlign: 'center', marginBottom: 8 },
+  subtitle: { fontSize: 16, color: '#888', textAlign: 'center', marginBottom: 48 },
   input: {
-    backgroundColor: '#0D0D0D',
-    color: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#333333',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 16,
-    fontSize: 16,
+    backgroundColor: '#1A1A1A', color: '#fff', borderRadius: 10, padding: 16,
+    fontSize: 16, marginBottom: 14, borderWidth: 1, borderColor: '#2A2A2A',
   },
-  error: { color: '#FF4500', marginBottom: 12, fontSize: 13 },
-  button: {
-    backgroundColor: '#FF4500',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 16,
+  btn: {
+    backgroundColor: '#FF4500', borderRadius: 10, padding: 16,
+    alignItems: 'center', marginTop: 8, marginBottom: 20,
   },
-  buttonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
-  link: { color: '#888888', textAlign: 'center', fontSize: 14 },
-  linkAccent: { color: '#FF4500', fontWeight: 'bold' },
+  btnText: { color: '#fff', fontWeight: '800', fontSize: 16, letterSpacing: 1 },
+  link: { color: '#888', textAlign: 'center', fontSize: 14 },
+  linkAccent: { color: '#FF4500', fontWeight: '700' },
 });

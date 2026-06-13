@@ -2,9 +2,8 @@ import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
+import { Text } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
 import FeedScreen from '../screens/FeedScreen';
@@ -15,62 +14,71 @@ import ChatListScreen from '../screens/ChatListScreen';
 import ChatScreen from '../screens/ChatScreen';
 import CalculatorScreen from '../screens/CalculatorScreen';
 
-const AuthStack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-const FeedStack = createNativeStackNavigator();
-const ProfileStack = createNativeStackNavigator();
-const ChatStack = createNativeStackNavigator();
+export type RootStackParamList = {
+  AuthStack: undefined;
+  MainTabs: undefined;
+  GarageScreen: { vehicleId: string };
+  ChatScreen: { chatId: string; chatName: string };
+};
 
-function FeedStackNavigator() {
+export type AuthStackParamList = {
+  Login: undefined;
+  SignUp: undefined;
+};
+
+export type MainTabParamList = {
+  Feed: undefined;
+  Map: undefined;
+  Calculator: undefined;
+  ChatList: undefined;
+  Profile: undefined;
+};
+
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
+
+function AuthNavigator() {
   return (
-    <FeedStack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0D0D0D' }, headerTintColor: '#FFFFFF' }}>
-      <FeedStack.Screen name="Feed" component={FeedScreen} options={{ title: 'Burnout Feed' }} />
-    </FeedStack.Navigator>
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+    </AuthStack.Navigator>
   );
 }
 
-function ProfileStackNavigator() {
-  return (
-    <ProfileStack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0D0D0D' }, headerTintColor: '#FFFFFF' }}>
-      <ProfileStack.Screen name="Profile" component={ProfileScreen} options={{ title: 'My Profile' }} />
-      <ProfileStack.Screen name="GarageScreen" component={GarageScreen} options={{ title: 'Garage' }} />
-    </ProfileStack.Navigator>
-  );
-}
-
-function ChatStackNavigator() {
-  return (
-    <ChatStack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0D0D0D' }, headerTintColor: '#FFFFFF' }}>
-      <ChatStack.Screen name="ChatList" component={ChatListScreen} options={{ title: 'Messages' }} />
-      <ChatStack.Screen name="ChatScreen" component={ChatScreen} options={{ title: 'Chat' }} />
-    </ChatStack.Navigator>
-  );
+function TabIcon({ name, focused }: { name: string; focused: boolean }) {
+  const icons: Record<string, string> = {
+    Feed: '🔥',
+    Map: '📍',
+    Calculator: '🧮',
+    ChatList: '💬',
+    Profile: '👤',
+  };
+  return <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.5 }}>{icons[name] || '•'}</Text>;
 }
 
 function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarStyle: { backgroundColor: '#0D0D0D', borderTopColor: '#333333' },
-        tabBarActiveTintColor: '#FF4500',
-        tabBarInactiveTintColor: '#888888',
         headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap = 'home';
-          if (route.name === 'FeedTab') iconName = focused ? 'flame' : 'flame-outline';
-          else if (route.name === 'MapTab') iconName = focused ? 'map' : 'map-outline';
-          else if (route.name === 'ChatTab') iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
-          else if (route.name === 'CalculatorTab') iconName = focused ? 'calculator' : 'calculator-outline';
-          else if (route.name === 'ProfileTab') iconName = focused ? 'person' : 'person-outline';
-          return <Ionicons name={iconName} size={size} color={color} />;
+        tabBarStyle: {
+          backgroundColor: '#0D0D0D',
+          borderTopColor: '#2A2A2A',
+          height: 60,
+          paddingBottom: 8,
         },
+        tabBarActiveTintColor: '#FF4500',
+        tabBarInactiveTintColor: '#666',
+        tabBarIcon: ({ focused }) => <TabIcon name={route.name} focused={focused} />,
       })}
     >
-      <Tab.Screen name="FeedTab" component={FeedStackNavigator} options={{ title: 'Feed' }} />
-      <Tab.Screen name="MapTab" component={MapScreen} options={{ title: 'Map', headerShown: false }} />
-      <Tab.Screen name="ChatTab" component={ChatStackNavigator} options={{ title: 'Chat' }} />
-      <Tab.Screen name="CalculatorTab" component={CalculatorScreen} options={{ title: 'Calc', headerStyle: { backgroundColor: '#0D0D0D' }, headerTintColor: '#FFFFFF', headerShown: true, headerTitle: 'Car Loan Calculator' }} />
-      <Tab.Screen name="ProfileTab" component={ProfileStackNavigator} options={{ title: 'Profile' }} />
+      <Tab.Screen name="Feed" component={FeedScreen} options={{ title: 'Feed' }} />
+      <Tab.Screen name="Map" component={MapScreen} options={{ title: 'Map' }} />
+      <Tab.Screen name="Calculator" component={CalculatorScreen} options={{ title: 'Calc' }} />
+      <Tab.Screen name="ChatList" component={ChatListScreen} options={{ title: 'Chats' }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Me' }} />
     </Tab.Navigator>
   );
 }
@@ -80,20 +88,36 @@ export default function AppNavigator() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0D0D0D' }}>
+      <View style={{ flex: 1, backgroundColor: '#0D0D0D', justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator color="#FF4500" size="large" />
       </View>
     );
   }
 
-  if (!currentUser) {
-    return (
-      <AuthStack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#0D0D0D' }, headerTintColor: '#FFFFFF' }}>
-        <AuthStack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-        <AuthStack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
-      </AuthStack.Navigator>
-    );
-  }
-
-  return <MainTabs />;
+  return (
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      {!currentUser ? (
+        <RootStack.Screen name="AuthStack" component={AuthNavigator} />
+      ) : (
+        <>
+          <RootStack.Screen name="MainTabs" component={MainTabs} />
+          <RootStack.Screen
+            name="GarageScreen"
+            component={GarageScreen}
+            options={{ headerShown: true, headerStyle: { backgroundColor: '#0D0D0D' }, headerTintColor: '#FF4500', title: 'Garage' }}
+          />
+          <RootStack.Screen
+            name="ChatScreen"
+            component={ChatScreen}
+            options={({ route }) => ({
+              headerShown: true,
+              headerStyle: { backgroundColor: '#0D0D0D' },
+              headerTintColor: '#FF4500',
+              title: (route.params as any).chatName,
+            })}
+          />
+        </>
+      )}
+    </RootStack.Navigator>
+  );
 }

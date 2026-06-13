@@ -1,8 +1,10 @@
-export interface Mod {
+export interface User {
   id: string;
-  name: string;
-  date: string;
-  cost: number;
+  username: string;
+  bio: string;
+  profilePhoto: string;
+  vehicles: string[]; // vehicle IDs
+  createdAt: Date;
 }
 
 export interface MaintenanceLog {
@@ -11,6 +13,13 @@ export interface MaintenanceLog {
   date: string;
   mileage: number;
   notes: string;
+}
+
+export interface Mod {
+  id: string;
+  name: string;
+  date: string;
+  cost: number;
 }
 
 export interface Vehicle {
@@ -23,6 +32,7 @@ export interface Vehicle {
   mods: Mod[];
   photos: string[];
   maintenanceLogs: MaintenanceLog[];
+  createdAt: Date;
 }
 
 export interface Comment {
@@ -30,18 +40,26 @@ export interface Comment {
   authorId: string;
   authorUsername: string;
   text: string;
-  createdAt: any;
+  createdAt: Date;
 }
 
 export interface Post {
   id: string;
   authorId: string;
   authorUsername: string;
+  authorPhoto: string;
   content: string;
   photos: string[];
-  likes: string[];
+  likes: string[]; // user IDs
   comments: Comment[];
-  createdAt: any;
+  createdAt: Date;
+}
+
+export interface AttendeeLocation {
+  userId: string;
+  lat: number;
+  lng: number;
+  updatedAt: Date;
 }
 
 export interface Meet {
@@ -55,8 +73,9 @@ export interface Meet {
   };
   date: string;
   hostId: string;
-  attendees: string[];
+  attendees: string[]; // user IDs
   isActive: boolean;
+  createdAt: Date;
 }
 
 export interface Message {
@@ -65,23 +84,15 @@ export interface Message {
   senderId: string;
   senderUsername: string;
   text: string;
-  createdAt: any;
+  createdAt: Date;
 }
 
 export interface Chat {
   id: string;
   name: string;
-  members: string[];
+  members: string[]; // user IDs
   isGroup: boolean;
   lastMessage: string;
-  lastMessageTime: any;
-}
-
-export interface User {
-  id: string;
-  username: string;
-  bio: string;
-  profilePhoto: string;
-  vehicles: string[];
-  email: string;
+  lastMessageTime: Date | null;
+  createdAt: Date;
 }
